@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace是定义唯一的mapper.xml名义上是可以任意名命的，但是为了绑定接口和接口中的方法，必须是接口的全类名-->
+<!--<mapper namespace="cheng.yan.feng.test">-->
+<mapper  namespace="mybatis.cheng.dao.CompanyMappe">
+
+   <!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>-->
+
+    <!-- <cache eviction="FIFO" flushInterval="60000" readOnly="false" size="1024"></cache> -->
+    <!--
+    eviction:缓存的回收策略：
+        • LRU – 最近最少使用的：移除最长时间不被使用的对象。
+        • FIFO – 先进先出：按对象进入缓存的顺序来移除它们。
+        • SOFT – 软引用：移除基于垃圾回收器状态和软引用规则的对象。
+        • WEAK – 弱引用：更积极地移除基于垃圾收集器状态和弱引用规则的对象。
+        • 默认的是 LRU。
+    flushInterval：缓存刷新间隔
+        缓存多长时间清空一次，默认不清空，设置一个毫秒值
+    readOnly:是否只读：
+        true：只读；mybatis认为所有从缓存中获取数据的操作都是只读操作，不会修改数据。
+                 mybatis为了加快获取速度，直接就会将数据在缓存中的引用交给用户。不安全，速度快
+        false：非只读：mybatis觉得获取的数据可能会被修改。
+                mybatis会利用序列化&反序列的技术克隆一份新的数据给你。安全，速度慢
+    size：缓存存放多少元素；
+    type=""：指定自定义缓存的全类名；
+            实现Cache接口即可；
+    -->
+    <!--1.test
+     id 是可以任意命名的，是为了确保唯一mapper.xml中唯一方法，但是为了与接口绑定我们必须要与接口中的方法名一致
+         paramterType:是传入的参数类型，一般是可以忽略的因为框架会自动识别
+         resultType 是返回的类型，如果是对象就是对象的全类名。也可以用别名，不过不推荐
+         databaseId：是定义的数据库，框架会根据数据库的链接类型，优先寻找定义相同的数据库的方法。
+
+    -->
+
+    <!--1.test -->
+    <select id="getCompanyByid"  parameterType="int"  resultType="mybatis.cheng.beans.Company" databaseId="mysql" >
+        select * from company where id=#{id};
+    </select>
+    <!--3.test -->
+    <!--测试绑定接口的方法 -->
+    <select id="getCompByID" resultType="mybatis.cheng.beans.Company" databaseId="mysql"   >
+
+        select * from company where id=#{id};
+
+    </select>
+    <!-- 当传入的是对象的时候，可以直接把对象中的属性直接复制给#{name},#{price}
+           对象的属性的名字要与传入的参数#{name},#{price}一样才能传入
+           parameterType 是传入的参数类型一般不用写
+           获取插入后的long类型
+           -->
+    <!--4.test  -->
+    <insert id="insertCompany" parameterType="mybatis.cheng.beans.Company" databaseId="mysql" useGeneratedKeys="true" keyProperty="id">
+
+        insert into company (name,price) values (#{name},#{price});
+
+    </insert>
+    <!--4.test  -->
+    <!--更新返回boolean-->
+    <update id="updateCompany" databaseId="mysql" useGeneratedKeys="true" keyProperty="id">
+        update company set name=#{name},price=#{price} where id=#{id}
+
+    </update>
+
+    <!--4.test 删除返回的是boolean -->
+
+    <delete id="delectCompany" databaseId="mysql" >
+        DELETE  from company where id=#{id}
+
+    </delete>
+    <!-- 当传入的参数类型是对象的时候，程序可以直接把对象中的属性复制给#{name},#{price}
+               parameterType 是传入的参数类型一般不用写
+               useGeneratedKeys:开启自动获取id,的自增的id，默认为false，现在开启,当插入数据时候，会自动把数据中自己增加的id返回给传入的对象
+               keyProperty：把传过来的id值自动复制给对象中的那个属性。
+              5.test -->
+    <insert id="insertCompayAutoID" parameterType="mybatis.cheng.beans.Company" databaseId="mysql" useGeneratedKeys="true" keyProperty="id">
+
+        insert into company (name,price) values (#{name},#{price});
+
+    </insert>
+
+    <!--6.@param 类型的映射，通过@param把多个参数封装的map类型key的值。 -->
+    <insert id="insertCompanyParam" databaseId="mysql" >
+
+        insert into company (name,price) VALUES (#{name},#{price})
+
+    </insert>
+
+    <!--7.test直接自己封装成map，然后map类型的key 值与#{name}一样。可以直接映射。-->
+    <insert id="insertCompanyMap" databaseId="mysql" >
+
+        insert into company (name,price) VALUES (#{name},#{price})
+
+    </insert>
+
+    <!--8.test查询list,resultType只需要返回一个list中的对象类名就可以了-->
+    <select id="selectCompanyList" databaseId="mysql" resultType="mybatis.cheng.beans.Company">
+        <!--动态绑定框架先把参数为name的值传到bind 标签的value,然后再重新命名，name=_name，然后再传入sql中 -->
+       <!--动态绑定是先把传过来的参数，复制给value中，然后再重新命名为_name重新传入sql中-->
+        <bind name="_name" value="'%'+name+'%'"></bind>
+        select * from company where name like #{_name}
+
+    </select>
+    <!--9.返回一个map，returnType：map 这个是别名-->
+    <select id="selectCompanyMap" databaseId="mysql" resultType="map">
+
+        select * from company where id=#{id};
+
+    </select>
+    <!-- 9.2返回一个map ，列名为key,值为value，但是如果是多值呢？-->
+    <select id="selectCompanyMapManyreturn" databaseId="mysql" resultType="map" >
+
+        select * from company where name like #{name}
+    </select>
+    <!--10.返回一个 company的map-->
+    <select id="selectMapCompany" databaseId="mysql" resultType="map">
+
+        select * from company where name LIKE #{name}
+
+    </select>
+    <!--11.返回自定义的map id:是引用map的唯一id，type 是对象的 全类名
+       是在关闭驼峰命名法的情况下，或者是命不规者，需要对应的时候，一般都选这种类型
+
+       -->
+    <resultMap id="mycomany" type="mybatis.cheng.beans.Company" >
+        <!--指定主键列的封装规则
+            id定义主键会底层有优化；
+            column：指定哪一列
+            property：指定对应的javaBean属性
+              -->
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="price" property="price"></result>
+        <!--不指定的会自己自动匹配。然后返回给对象中-->
+    </resultMap>
+
+    <!--11.返回一个 自己定义的的map,resultMap,与resultType是互斥的只能有一个返回类型存在，不然会报错。
+    定义一个map-->
+    <select id="selectMyMapCompany" databaseId="mysql" resultMap="mycomany">
+
+        select * from company where id=#{id}
+
+    </select>
+    <!--12.这个是关联查询，是关联查询，这是第一种方法-->
+    <resultMap id="mycomanyandcar" type="mybatis.cheng.beans.Company" >
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="price" property="price"></result>
+        <result column="car_id" property="car.id"></result>
+        <result column="car_name" property="car.name"></result>
+        <result column="car_price" property="car.price"></result>
+        <result column="car_companyid" property="car.companyid"></result>
+
+    </resultMap>
+    <!--12.关联查询，一次查询相关联的两张表，返回单个表-->
+    <select id="selectMyMapCompanyAndCar" databaseId="mysql" resultMap="mycomanyandcar">
+
+        select  p.id id,p.name name ,p.price price,a.id  car_id,a.name car_name,a.price car_price ,a.companyid  car_companyid from company  p,car  a
+        where p.id=a.companyid and p.id=#{id}
+
+    </select>
+    <!--返回单个第二种方法 -->
+    <resultMap id="mycomanyandcar2" type="mybatis.cheng.beans.Company" >
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="price" property="price"></result>
+        <!--property指定beans中的那个属性是一个映射的对象
+        javaType：是这个对象的全类名
+        -->
+        <association property="car" javaType="mybatis.cheng.beans.Car">
+            <!-- 这是把查出来的值映射到bean中-->
+            <id column="car_id" property="id" />
+            <result column="car_name" property="name" />
+            <result column="car_price" property="price" />
+            <result column="car_companyid" property="companyid"></result>
+        </association>
+
+    </resultMap>
+    <!--12.关联查询，一次查询相关联的两张表，返回单个表第二个方法-->
+    <select id="selectMyMapCompanyAndCar2" databaseId="mysql" resultMap="mycomanyandcar2">
+
+        select  p.id id,p.name name ,p.price price,a.id  car_id,a.name car_name,a.price car_price ,a.companyid as car_companyid from company  p,car  a
+        where p.id=a.companyid and p.id=#{id}
+
+    </select>
+
+
+
+    <!--13.这个是返回的是多个子类 list-->
+    <resultMap id="mycomanyandcarList" type="mybatis.cheng.beans.Company" >
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="price" property="price"></result>
+        <!--当返回的是个集合对象的时候用
+        property：是定义在主类的属性的名字，一定要一样
+        collection 是对象中包含List使用的。
+        ofType:指定集合里面元素的类型，一般我们用全类名。
+        单个用类时候，用association 和javatype，而collection 和ofType是多个类
+        -->
+        <collection property="listcar" ofType="mybatis.cheng.beans.Car">
+            <id  column="car_id" property="id"></id>
+            <result column="car_name" property="name"></result>
+            <result column="car_price" property="price"></result>
+            <result column="car_companyid" property="companyid"></result>
+        </collection>
+    </resultMap>
+    <!--13.关联查询，一次查询相关联的两张表，返回多个子级表-->
+    <select id="selectMyMapCompanyAndCarList" databaseId="mysql" resultMap="mycomanyandcarList">
+
+        select  p.id id,p.name name ,p.price price,a.id as car_id,a.name car_name,a.price car_price ,a.companyid as car_companyid from company  p,car  a
+        where p.id=a.companyid and p.id=#{id}
+
+    </select>
+    <!-- 14.关联sql语句,这样比较简单一些，不用写专门的sql，而且，多个子对象，和一个对象都可以用相同的sql语句，所以
+          这个比较推荐，而关联查询，还需要写left join 语句，遇见list《对象》还需要分开写，没有这个方法方便-->
+    <resultMap id="mycompanyunicarSql" type="mybatis.cheng.beans.Company">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <!--剩下的属性只要列名与对象的属性名一样，会自动映射 -->
+        <!-- association定义关联对象的封装规则
+             select:表明当前属性是调用select指定的方法查出的结果
+             column:指定将哪一列的值传给这个方法相当于像这个方法传入一个参数
+
+             流程：使用select指定的方法（传入column指定的这列参数的值）查出对象，并封装给property指定的属性
+          -->
+        <association property="listcar" select="mybatis.cheng.dao.CompanyMappe.selectCarListSqlUni"
+                     column="id" >
+        </association>
+    </resultMap>
+
+
+    <!--14.关联查询,查询sqlcompany的sql语句-->
+    <select id="selectCompanyAndCarListSqlUni" databaseId="mysql" resultMap="mycompanyunicarSql">
+        <!-- 引用外部定义的sql-->
+        select <include refid="selectcomany"></include>  from company  p
+        where   p.id=#{id}
+
+    </select>
+    <!--这个是定义的sql语句，可以上面引用，把一些公共的公用的sql语句抽取出来。-->
+    <sql id="selectcomany" databaseId="mysql">
+        id,name,price
+    </sql>
+    <!--14.关联查询，一次查询相关联的两张表，返回多个子级表-->
+    <select id="selectCarListSqlUni" databaseId="mysql"  resultType="mybatis.cheng.beans.Car">
+
+        select   * from  car  a
+        where a.companyid =#{id}
+
+    </select>
+    <!--15.批量插入数据，利用foreach进行循环插入-->
+    <!--先要获取批量插入自增的id，必须要把传入的list<Company>定义为list-->
+    <insert id="insertmanyCompany" databaseId="mysql" useGeneratedKeys="true" keyProperty="id">
+
+        insert into  Company  (name,price)
+        values
+        <foreach collection="list" item="item" separator="," >
+            (#{item.name},#{item.price})
+
+        </foreach>
+
+
+    </insert>
+</mapper>
+

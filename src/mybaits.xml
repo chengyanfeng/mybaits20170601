@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+        <configuration>
+    <!--1. -引入外部数据源文件-->
+   <properties resource="db.properties" ></properties>
+    <!--2.setting的设置很多重要的设置都是在这里开启的 -->
+    <settings>
+        <!--这个开启的是驼峰命名法的，可以把以驼峰命名法的beans映射到数据库 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--显示的指定每个我们需要更改的配置的值，即使他是默认的。防止版本更新带来的问题  -->
+        <!--这个是在关联查询的时候，是开启的懒加载。 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+    </settings>
+    <!--3.typeAlise 设置别名，也可以用@alise在beans类中设置 -->
+    <typeAliases>
+        <!--命名单个beans -->
+        <typeAlias type="mybatis.cheng.beans.Company" alias="company"></typeAlias>
+        <!-- 多个命名法，整个包都是命名为beans的首字母小写的类名-->
+        <package name="mybaits.cheng.*"></package>
+
+    </typeAliases>
+    <!--4.环境配置，主要配置是数据源，default是设置的默认的数据源-->
+    <environments default="mysql">
+        <!--设置的environID,唯一的id -->
+        <environment id="mysql">
+            <!-- 开启事务管理器，并且设置事务管理器的类别，类型用别名-->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 创建什么类型的数据库-->
+            <dataSource type="POOLED">
+                <!--引用文件的数据 -->
+                <property name="driver" value="${driver}" />
+                <property name="url" value="${url}" />
+                <property name="username" value="${user}" />
+                <property name="password" value="${password}" />
+            </dataSource>
+        </environment>
+        <environment id="orcle">
+            <!-- 开启事务管理器，并且设置事务管理器的类别，类型用别名-->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 创建什么类型的数据库-->
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}" />
+                <property name="url" value="${url}" />
+                <property name="username" value="${user}" />
+                <property name="password" value="${password}" />
+            </dataSource>
+        </environment>
+
+    </environments>
+ <!--5.配置不同的数据库表示 -->
+    <!-- 5、databaseIdProvider：支持多数据库厂商的；
+           type="DB_VENDOR"：VendorDatabaseIdProvider
+               作用就是得到数据库厂商的标识(驱动getDatabaseProductName())，mybatis就能根据数据库厂商标识来执行不同的sql;
+               MySQL，Oracle，SQL Server,xxxx
+        -->
+    <!-- DB_VENDOR是支持多个数据库的驱动程序，也是别名。-->
+    <databaseIdProvider type="DB_VENDOR">
+        <!--为不同的厂商起别名 -->
+        <property name="MySQL" value="mysql"/>
+        <property name="Oracle" value="oracle"/>
+        <property name="SQL Server" value="sqlserver"/>
+    </databaseIdProvider>
+<!--6.注册mapper.xml文件，或者注册注解版本的，或者注册绑定绑定的calss的-->
+
+<mappers>
+    <!--单独测试mapper.xml的注册-->
+    <mapper resource="mybatis/cheng/dao/CompanyMapper.xml"></mapper>
+    <!-- 注册的是绑定的class，或者是注解版本的class,但是不能同时注解绑定的Class和mapper.xml-->
+    <mapper class="mybatis.yan.dao.CompanyAnntion"></mapper>
+    <!--这个注解是全部注册这个包中所有的Mapper.xml 或者是mapper.xml -->
+    <!--<package name="mybatis.*"></package>-->
+</mappers>
+
+
+
+
+
+
+
+
+
+
+
+</configuration>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
