@@ -1,10 +1,12 @@
 package mybatis.cheng.beans;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2017/5/25 0025.
  */
 
-public class Car {
+public class Car  implements Serializable{
     public  Integer id;
      public  String name;
     public  Integer price;

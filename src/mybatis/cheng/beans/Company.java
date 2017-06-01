@@ -1,11 +1,13 @@
 package mybatis.cheng.beans;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Administrator on 2017/5/18 0018.
  */
-public class Company   {
+//实现序列化接口，实现缓存。
+public class Company   implements Serializable{
     public String name;
     public  int price;
     public  int id;

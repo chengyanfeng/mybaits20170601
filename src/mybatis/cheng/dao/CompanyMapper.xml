@@ -6,7 +6,7 @@
 <!--<mapper namespace="cheng.yan.feng.test">-->
 <mapper  namespace="mybatis.cheng.dao.CompanyMappe">
 
-   <!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>-->
+   <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>
 
     <!-- <cache eviction="FIFO" flushInterval="60000" readOnly="false" size="1024"></cache> -->
     <!--
@@ -89,7 +89,7 @@
     </insert>
 
     <!--7.test直接自己封装成map，然后map类型的key 值与#{name}一样。可以直接映射。-->
-    <insert id="insertCompanyMap" databaseId="mysql" >
+    <insert id="insertCompanyMap" databaseId="mysql"  >
 
         insert into company (name,price) VALUES (#{name},#{price})
 
@@ -110,7 +110,7 @@
 
     </select>
     <!-- 9.2返回一个map ，列名为key,值为value，但是如果是多值呢？-->
-    <select id="selectCompanyMapManyreturn" databaseId="mysql" resultType="map" >
+    <select id="selectCompanyMapManyreturn" databaseId="mysql" resultType="map" useCache="true">
 
         select * from company where name like #{name}
     </select>
@@ -215,7 +215,7 @@
     </select>
     <!-- 14.关联sql语句,这样比较简单一些，不用写专门的sql，而且，多个子对象，和一个对象都可以用相同的sql语句，所以
           这个比较推荐，而关联查询，还需要写left join 语句，遇见list《对象》还需要分开写，没有这个方法方便-->
-    <resultMap id="mycompanyunicarSql" type="mybatis.cheng.beans.Company">
+    <resultMap id="mycompanyunicarSql" type="mybatis.cheng.beans.Company" >
         <id column="id" property="id"></id>
         <result column="name" property="name"></result>
         <!--剩下的属性只要列名与对象的属性名一样，会自动映射 -->
@@ -232,7 +232,7 @@
 
 
     <!--14.关联查询,查询sqlcompany的sql语句-->
-    <select id="selectCompanyAndCarListSqlUni" databaseId="mysql" resultMap="mycompanyunicarSql">
+    <select id="selectCompanyAndCarListSqlUni" databaseId="mysql" resultMap="mycompanyunicarSql" useCache="true">
         <!-- 引用外部定义的sql-->
         select <include refid="selectcomany"></include>  from company  p
         where   p.id=#{id}
@@ -243,7 +243,7 @@
         id,name,price
     </sql>
     <!--14.关联查询，一次查询相关联的两张表，返回多个子级表-->
-    <select id="selectCarListSqlUni" databaseId="mysql"  resultType="mybatis.cheng.beans.Car">
+    <select id="selectCarListSqlUni" databaseId="mysql"  resultType="mybatis.cheng.beans.Car" useCache="true">
 
         select   * from  car  a
         where a.companyid =#{id}
@@ -251,7 +251,7 @@
     </select>
     <!--15.批量插入数据，利用foreach进行循环插入-->
     <!--先要获取批量插入自增的id，必须要把传入的list<Company>定义为list-->
-    <insert id="insertmanyCompany" databaseId="mysql" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertmanyCompany" databaseId="mysql" useGeneratedKeys="true" keyProperty="id" >
 
         insert into  Company  (name,price)
         values
